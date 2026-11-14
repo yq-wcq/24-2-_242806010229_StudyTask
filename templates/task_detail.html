@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}{{ task.title }} · StudyTask{% endblock %}
+
+{% block content %}
+{% set state = task|deadline_state %}
+{% set status_class = {'待完成': 'todo', '进行中': 'doing', '已完成': 'done'} %}
+{% set priority_class = {'高': 'p-high', '中': 'p-mid', '低': 'p-low'} %}
+
+<section class="page-head">
+  <div>
+    <a class="back-link" href="{{ url_for('index') }}">← 返回任务列表</a>
+    <h1>{{ task.title }}</h1>
+    <div class="badge-row">
+      <span class="status status-{{ status_class[task.status] }}">{{ task.status }}</span>
+      <span class="priority {{ priority_class[task.priority] }}">优先级：{{ task.priority }}</span>
+      <span class="course-tag">{{ task.course }}</span>
+      {% if state == 'overdue' %}
+        <span class="deadline-badge overdue">已逾期 · {{ task|days_left_text }}</span>
+      {% elif state == 'soon' %}
+        <span class="deadline-badge soon">即将到期 · {{ task|days_left_text }}</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="head-actions">
+    <a class="btn btn-primary" href="{{ url_for('edit_task', task_id=task.id) }}">编辑任务</a>
+    <a class="btn btn-danger-ghost" href="{{ url_for('confirm_delete', task_id=task.id) }}">删除</a>
+  </div>
+</section>
+
+<section class="panel detail-panel">
+  <dl class="detail-grid">
+    <div>
+      <dt>所属课程</dt>
+      <dd>{{ task.course }}</dd>
+    </div>
+    <div>
+      <dt>截止日期</dt>
+      <dd>
+        {{ task.due_date }}
+        {% if task.status != '已完成' %}
+          <span class="muted">（{{ task|days_left_text }}）</span>
+        {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>优先级</dt>
+      <dd>{{ task.priority }}</dd>
+    </div>
+    <div>
+      <dt>当前状态</dt>
+      <dd>{{ task.status }}</dd>
+    </div>
+    <div>
+      <dt>创建时间</dt>
+      <dd>{{ task.created_at }}</dd>
+    </div>
+    <div>
+      <dt>更新时间</dt>
+      <dd>{{ task.updated_at }}</dd>
+    </div>
+  </dl>
+
+  <div class="detail-desc">
+    <h2>任务描述</h2>
+    {% if task.description %}
+      <p class="pre-wrap">{{ task.description }}</p>
+    {% else %}
+      <p class="muted">暂无描述。</p>
+    {% endif %}
+  </div>
+
+  <div class="status-actions">
+    <h2>状态操作</h2>
+    <p class="muted">按“待完成 → 进行中 → 已完成”逐步推进，也可以直接调整为其他状态。</p>
+    <div class="status-buttons">
+      {% for s in statuses %}
+        <form method="post" action="{{ url_for('change_status', task_id=task.id) }}">
+          <input type="hidden" name="status" value="{{ s }}">
+          <button class="btn {% if task.status == s %}btn-primary{% else %}btn-ghost{% endif %}"
+                  type="submit" {% if task.status == s %}disabled{% endif %}>
+            {% if task.status == s %}当前：{% endif %}{{ s }}
+          </button>
+        </form>
+      {% endfor %}
+    </div>
+    <p class="muted small">下一状态建议：{{ next_status }}（{{ next_label }}）</p>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}{{ '新建任务' if mode == 'create' else '编辑任务' }} · StudyTask{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div>
+    <h1>{{ '新建任务' if mode == 'create' else '编辑任务' }}</h1>
+    <p class="muted">带 <span class="required">*</span> 的字段为必填项。</p>
+  </div>
+  <a class="btn btn-ghost" href="{{ url_for('index') }}">返回列表</a>
+</section>
+
+<section class="panel form-panel">
+  <form method="post"
+        action="{{ url_for('submit_task') if mode == 'create' else url_for('edit_task', task_id=task.id) }}"
+        novalidate>
+    <div class="field">
+      <label for="title">任务名称 <span class="required">*</span></label>
+      <input id="title" name="title" type="text" maxlength="100"
+             value="{{ task.title }}" placeholder="例如：完成数据结构链表实验报告">
+      {% if errors.title %}<p class="field-error">{{ errors.title }}</p>{% endif %}
+    </div>
+
+    <div class="field">
+      <label for="course">所属课程 <span class="required">*</span></label>
+      <input id="course" name="course" type="text" maxlength="60" list="course-options"
+             value="{{ task.course }}" placeholder="例如：数据结构">
+      <datalist id="course-options">
+        {% for c in courses|default([]) %}
+          <option value="{{ c }}"></option>
+        {% endfor %}
+      </datalist>
+      {% if errors.course %}<p class="field-error">{{ errors.course }}</p>{% endif %}
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="due_date">截止日期 <span class="required">*</span></label>
+        <input id="due_date" name="due_date" type="date" value="{{ task.due_date }}">
+        {% if errors.due_date %}<p class="field-error">{{ errors.due_date }}</p>{% endif %}
+      </div>
+      <div class="field">
+        <label for="priority">优先级 <span class="required">*</span></label>
+        <select id="priority" name="priority">
+          {% for p in priorities %}
+            <option value="{{ p }}" {% if task.priority == p %}selected{% endif %}>{{ p }}</option>
+          {% endfor %}
+        </select>
+        {% if errors.priority %}<p class="field-error">{{ errors.priority }}</p>{% endif %}
+      </div>
+      <div class="field">
+        <label for="status">任务状态</label>
+        <select id="status" name="status">
+          {% for s in statuses %}
+            <option value="{{ s }}" {% if task.status == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+        {% if errors.status %}<p class="field-error">{{ errors.status }}</p>{% endif %}
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="description">任务描述</label>
+      <textarea id="description" name="description" rows="5" maxlength="1000"
+                placeholder="补充作业要求、参考资料或自己的备注（可选，不超过 1000 字）">{{ task.description }}</textarea>
+      {% if errors.description %}<p class="field-error">{{ errors.description }}</p>{% endif %}
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">{{ '创建任务' if mode == 'create' else '保存修改' }}</button>
+      <a class="btn btn-ghost" href="{{ url_for('index') if mode == 'create' else url_for('task_detail', task_id=task.id) }}">取消</a>
+    </div>
+  </form>
+</section>
+{% endblock %}
