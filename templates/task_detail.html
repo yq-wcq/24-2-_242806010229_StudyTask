@@ -15,7 +15,7 @@
       <span class="priority {{ priority_class[task.priority] }}">优先级：{{ task.priority }}</span>
       <span class="course-tag">{{ task.course }}</span>
       {% if state == 'overdue' %}
-        <span class="deadline-badge overdue">已逾期 · {{ task|days_left_text }}</span>
+        <span class="deadline-badge overdue">{{ task|days_left_text }}</span>
       {% elif state == 'soon' %}
         <span class="deadline-badge soon">即将到期 · {{ task|days_left_text }}</span>
       {% endif %}

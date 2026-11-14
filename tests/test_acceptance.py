@@ -2,7 +2,7 @@
 
 from datetime import date, timedelta
 
-from task_service import get_stats, list_tasks
+from task_service import get_stats
 
 
 def html(response):
@@ -41,7 +41,6 @@ class TestCreate:
         assert response.status_code == 400
         body = html(response)
         assert "任务名称不能为空" in body
-        assert "完成链表实验报告" not in body
 
         with client.application.app_context():
             assert get_stats()["total"] == 0

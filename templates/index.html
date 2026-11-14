@@ -90,7 +90,7 @@
           <td>
             <div>{{ task.due_date }}</div>
             {% if state == 'overdue' %}
-              <span class="deadline-badge overdue">已逾期 · {{ task|days_left_text }}</span>
+              <span class="deadline-badge overdue">{{ task|days_left_text }}</span>
             {% elif state == 'soon' %}
               <span class="deadline-badge soon">即将到期 · {{ task|days_left_text }}</span>
             {% elif task.status != '已完成' %}
