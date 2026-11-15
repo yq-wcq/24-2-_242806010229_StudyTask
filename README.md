@@ -69,6 +69,7 @@ task_service.py        校验、筛选、逾期判断与统计
 templates/             Jinja2 页面模板
 static/style.css       页面样式
 docs/需求验收表.md      T1—T10 验收记录
+AI_DEV_LOG.md          AI 辅助开发日志
 requirements.txt       Python 依赖
 README.md              运行说明
 ```
