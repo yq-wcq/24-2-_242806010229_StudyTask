@@ -1,6 +1,8 @@
 # StudyTask 个人学习任务管理系统
 
-StudyTask 是一个单用户学习任务管理 Web 应用，用于记录课程作业、实验和考试准备。项目为《软件工程》实验一交付物，按附录 A 的 SRS 实现，技术栈为 **Python 3.11+ / Flask / SQLite**。
+StudyTask 是一个单用户学习任务管理 Web 应用，用于记录课程作业、实验和考试准备。项目为《软件工程》实验一交付物，按附录 A 的 SRS 实现，技术栈为 **Python 3.10+ / Flask / SQLite**。
+
+**线上演示：<https://ZYQ.pythonanywhere.com>**（PythonAnywhere 免费实例，首次访问可能稍慢）
 
 ## 1. 功能范围
 
@@ -14,11 +16,11 @@ StudyTask 是一个单用户学习任务管理 Web 应用，用于记录课程�
 | P1-F06 | 基础统计 | 任务总数、已完成数、完成率（无任务时显示 0%） |
 | P1-F07 | 本地持久化 | SQLite 文件存储，重启服务后数据保留 |
 
-不在范围内：用户注册、多用户权限、任务共享、邮件/短信提醒、第三方日历、移动端 App、云部署。
+不在产品功能范围内：用户注册、多用户权限、任务共享、邮件/短信提醒、第三方日历、移动端 App；线上演示环境见第 8 节。
 
 ## 2. 技术栈
 
-- Python 3.11+（开发环境 Python 3.13.2）
+- Python 3.10+（本地开发 Python 3.13.2，线上 Python 3.10.12）
 - Flask 3.1.2
 - SQLite（Python 标准库 `sqlite3`，无额外驱动）
 - Jinja2 模板 + 原生 CSS
@@ -99,10 +101,56 @@ python -m pytest -v
 - [运行截图](docs/evidence/)：任务列表、筛选、详情、删除确认、表单校验。
 - [200 条任务性能验证](docs/evidence/performance_200.txt)：列表平均响应约 19 ms。
 - [测试完整输出](docs/evidence/pytest_output.txt)：25 passed 的实际记录。
+- [线上端到端验收](docs/evidence/deploy_verify.txt)：创建、状态流转、删除、删除后 404。
+- [线上首页截图](docs/evidence/06_online_home.png)：PythonAnywhere 实例首页。
 
-## 8. 已知限制
+## 8. 线上部署（PythonAnywhere）
 
-- 按 SRS A.5，系统不包含登录、多用户权限、任务共享、提醒推送与云部署。
-- 使用 Flask 开发服务器，仅面向本地单用户使用。
-- 默认 `SECRET_KEY` 有开发默认值；若未来扩展为对外服务，须通过环境变量覆盖。
+线上地址：<https://ZYQ.pythonanywhere.com>
+
+线上已有 6 条与报告截图一致的演示数据（含逾期、今天截止、进行中与已完成），可直接在页面上编辑或删除。
+
+部署步骤：
+
+1. 注册 PythonAnywhere Beginner 免费账号，打开 **Consoles → Bash**。
+2. 克隆仓库并安装依赖：
+
+```bash
+git clone https://github.com/yq-wcq/24-2-_242806010229_StudyTask.git
+cd 24-2-_242806010229_StudyTask
+mkvirtualenv studytask --python=/usr/bin/python3.10
+pip install -r requirements.txt
+```
+
+3. 打开 **Web → Add a new web app → Manual configuration → Python 3.10**。
+4. Source code 填 `/home/ZYQ/24-2-_242806010229_StudyTask`，Virtualenv 填 `/home/ZYQ/.virtualenvs/studytask`。
+5. 编辑 WSGI 配置文件：
+
+```python
+import os
+import sys
+import time
+
+os.environ["TZ"] = "Asia/Shanghai"
+time.tzset()
+
+path = "/home/ZYQ/24-2-_242806010229_StudyTask"
+if path not in sys.path:
+    sys.path.insert(0, path)
+
+os.environ.setdefault("SECRET_KEY", "studytask-zyq-2026")
+
+from app import app as application
+```
+
+6. 回到 Web 页面点 **Reload**，访问线上地址。
+7. 线上数据库位于 `/home/ZYQ/24-2-_242806010229_StudyTask/instance/studytask.db`；免费实例需每 30 天登录续期一次。
+
+## 9. 已知限制
+
+- 按 SRS A.5，系统不包含登录、多用户权限、任务共享和提醒推送。
+- 线上使用 PythonAnywhere 免费实例，访问速度与可用性受平台限制，每 30 天需登录续期。
+- SQLite 单文件适合单用户使用；若多人并发写入需更换数据库。
+- 本地使用 Flask 开发服务器，线上由 PythonAnywhere WSGI 托管。
+- 默认 `SECRET_KEY` 有开发默认值；线上已通过 WSGI 环境变量覆盖。
 - 截止日期使用浏览器原生日期控件，显示格式随浏览器语言设置变化，但提交值固定为 `YYYY-MM-DD`。
