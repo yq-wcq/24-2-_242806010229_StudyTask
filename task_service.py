@@ -135,6 +135,9 @@ def delete_task(task_id):
 
 
 def get_task(task_id):
+    # 超出 SQLite INTEGER 范围的主键直接视为不存在，避免驱动抛出 OverflowError
+    if not isinstance(task_id, int) or not 1 <= task_id <= 2**63 - 1:
+        return None
     return get_db().execute("SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
 
 

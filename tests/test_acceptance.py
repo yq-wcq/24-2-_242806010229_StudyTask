@@ -185,6 +185,12 @@ class TestReadUpdateDelete:
         assert client.get("/tasks/9999").status_code == 404
         assert client.get("/tasks/9999/edit").status_code == 404
 
+    def test_oversized_task_id_returns_404(self, client):
+        huge_id = "9" * 30
+        assert client.get(f"/tasks/{huge_id}").status_code == 404
+        assert client.get(f"/tasks/{huge_id}/edit").status_code == 404
+        assert client.get(f"/tasks/{huge_id}/delete").status_code == 404
+
 
 class TestFilter:
     def _seed(self, make_task):

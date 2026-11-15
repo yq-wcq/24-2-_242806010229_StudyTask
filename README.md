@@ -35,7 +35,7 @@ StudyTask/
 ├── static/style.css        # 页面样式
 ├── tests/
 │   ├── conftest.py         # 测试夹具（临时数据库）
-│   └── test_acceptance.py  # 24 条自动化测试
+│   └── test_acceptance.py  # 25 条自动化测试
 ├── docs/
 │   ├── 需求验收表.md
 │   ├── 实验一报告.docx
@@ -70,12 +70,12 @@ python app.py
 python -m pytest -v
 ```
 
-预期结果：`24 passed`。测试使用临时 SQLite 文件，不会影响本地演示数据。
+预期结果：`25 passed`。测试使用临时 SQLite 文件，不会影响本地演示数据。
 
 | 测试类 | 覆盖内容 |
 | --- | --- |
 | `TestCreate` | T1、T2、必填项、非法日期、非法枚举、超长字段 |
-| `TestReadUpdateDelete` | T3、T4、T9、404 |
+| `TestReadUpdateDelete` | T3、T4、T9、404、超大任务 ID |
 | `TestFilter` | T5（单项与组合筛选） |
 | `TestDeadline` | T6、T7、已完成任务不提示、今天截止、4 天后不提示 |
 | `TestStats` | T8、零任务、非整数完成率 |
@@ -90,31 +90,19 @@ python -m pytest -v
 5. **输入校验**：名称 1—100 字、课程 1—60 字、描述 ≤1000 字；日期必须是有效的 `YYYY-MM-DD`；优先级与状态必须属于枚举值。校验失败返回 HTTP 400，并保留用户已填内容。
 6. **删除**：`GET /tasks/<id>/delete` 只展示确认页，`POST` 才真正删除，取消不会改变数据。
 
-## 7. 部署到云服务器（可选，本次未执行）
-
-本次提交在本地完成运行与验收，未申请云服务器，因此没有线上访问地址。若需部署到 Linux 云主机，可参考：
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt gunicorn
-export SECRET_KEY="替换为随机字符串"
-gunicorn -w 2 -b 0.0.0.0:8000 app:app
-```
-
-再使用 Nginx 反向代理到 `127.0.0.1:8000`，并在安全组放行 80 端口。该步骤需在真实服务器执行后再补充访问地址。
-
-## 8. 文档与证据
+## 7. 文档与证据
 
 - [需求验收表](docs/需求验收表.md)：T1—T10 实际结果、证据与补充校验用例。
 - [AI_DEV_LOG.md](AI_DEV_LOG.md)：关键提示词、AI 产出、问题与人工判断。
 - [实验一报告.docx](docs/实验一报告.docx)：不超过 4 页的实验报告。
 - [实验一演示.pptx](docs/实验一演示.pptx)：演示用 PPT。
 - [运行截图](docs/evidence/)：任务列表、筛选、详情、删除确认、表单校验。
+- [200 条任务性能验证](docs/evidence/performance_200.txt)：列表平均响应约 19 ms。
+- [测试完整输出](docs/evidence/pytest_output.txt)：25 passed 的实际记录。
 
-## 9. 已知限制
+## 8. 已知限制
 
-- 单用户本地使用，无登录与权限控制（属于 SRS 范围外）。
-- 使用 Flask 开发服务器；部署到公网时应使用 gunicorn/uWSGI 等 WSGI 服务器。
-- 默认 `SECRET_KEY` 仅用于本地开发，部署时须通过环境变量覆盖。
+- 按 SRS A.5，系统不包含登录、多用户权限、任务共享、提醒推送与云部署。
+- 使用 Flask 开发服务器，仅面向本地单用户使用。
+- 默认 `SECRET_KEY` 有开发默认值；若未来扩展为对外服务，须通过环境变量覆盖。
 - 截止日期使用浏览器原生日期控件，显示格式随浏览器语言设置变化，但提交值固定为 `YYYY-MM-DD`。
