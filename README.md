@@ -56,16 +56,21 @@ python app.py
 
 首次启动会自动创建 `instance/studytask.db`；如需清空数据，停止服务后删除该文件再启动。
 
+## 验收记录
+
+T1—T10 的操作步骤、预期结果、实际结果和是否通过，见 `docs/需求验收表.md`。
+
 ## 项目结构
 
 ```text
-app.py              Flask 路由与页面入口
-db.py               SQLite 连接与建表
-task_service.py     校验、筛选、逾期判断与统计
-templates/          Jinja2 页面模板
-static/style.css    页面样式
-requirements.txt    Python 依赖
-README.md           运行说明
+app.py                 Flask 路由与页面入口
+db.py                  SQLite 连接与建表
+task_service.py        校验、筛选、逾期判断与统计
+templates/             Jinja2 页面模板
+static/style.css       页面样式
+docs/需求验收表.md      T1—T10 验收记录
+requirements.txt       Python 依赖
+README.md              运行说明
 ```
 
 ## 线上部署
